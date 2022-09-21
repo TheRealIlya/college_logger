@@ -7,3 +7,6 @@ spring:
 
 kafka:
   groupId: first
+
+logstash:
+  server: ${LOGSTASH_SERVER}

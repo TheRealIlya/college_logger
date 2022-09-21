@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <springProperty name="logstash-server" source="logstash.server"/>
+
+    <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+
+        <destination>${logstash-server}</destination>
+
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    if(formattedMessage.contains("type:url"))
+                    return true;
+
+                    if(formattedMessage.contains("type:auth"))
+                    return true;
+
+                    return false;
+                </expression>
+            </evaluator>
+            <OnMatch>NEUTRAL</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+        </filter>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <logLevel/>
+                <pattern>
+                    <pattern>
+                        {
+                        "appName": "college_app"
+                        }
+                    </pattern>
+                </pattern>
+                <message/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="stash"/>
+    </root>
+
+    <logger name="org.springframework" level="INFO"/>
+</configuration>
